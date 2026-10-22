@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Building Digital Twin</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 25px 40px;
+            background: #111827;
+            border-bottom: 1px solid #334155;
+        }
+
+        header h1 {
+            font-size: 28px;
+        }
+
+        header p {
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        .live {
+            color: #22c55e;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 35px 40px;
+        }
+
+        .section-title {
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .rooms {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .room {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 25px;
+            transition: 0.3s;
+        }
+
+        .room:hover {
+            transform: translateY(-4px);
+        }
+
+        .room h3 {
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .temperature {
+            font-size: 38px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .status {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .dashboard {
+            margin-top: 35px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 30px;
+        }
+
+        .dashboard p {
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .rooms {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .rooms {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #334155;
+}
+
+.summary-card h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+}
+
+.summary-card p {
+    margin: 0;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.temp-bar {
+    width: 100%;
+    height: 8px;
+    background: #334155;
+    border-radius: 10px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.temp-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.building-status {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 12px;
+    background: #1e293b;
+    color: #22c55e;
+}
+
+   .building-view {
+    background: #0f172a;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    border: 1px solid #334155;
+}
+
+.building-view h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.building-floor {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-width: 700px;
+    margin: 20px auto 0;
+}
+
+.building-room {
+    background: #1e293b;
+    border: 2px solid #475569;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.building-room h3 {
+    margin: 0 0 10px;
+}
+
+.building-room p {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.building-room span {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.ac-status {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #94a3b8;
+}
+
+.activity-log {
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.activity-item {
+    background: #1e293b;
+    border-left: 4px solid #38bdf8;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#last-updated {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #94a3b8;
+    text-align: center;
+}
+.subtitle {
+    color: #94a3b8;
+    margin: 5px 0;
+}
+
+.live-indicator {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #163b2a;
+    color: #22c55e;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+@media (max-width: 800px) {
+    .summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .summary {
+        grid-template-columns: 1fr;
+    }
+}
+.summary-card,
+.building-room {
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.summary-card:hover,
+.building-room:hover {
+    transform: translateY(-3px);
+    border-color: #38bdf8;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+   
+
+<body>
+
+    <header>
+        <h1>🏢 Smart Building Digital Twin</h1>
+        <p class="subtitle">Real-Time Building Monitoring System</p>
+        <div class="live-indicator">● LIVE SYSTEM</div>
+        <div id="last-updated">
+          🕒Last Updated: --
+        </div>
+        
+    </header>
+
+    <div class="container">
+
+        <h2 class="section-title">Building Overview</h2>
+        <div class="summary">
+    <div class="summary-card">
+        <h3>🏢 Rooms</h3>
+        <p id="room-count">4</p>
+    </div>
+
+    <div class="summary-card">
+        <h3>🌡️ Average Temperature</h3>
+        <p id="average-temp">-- °C</p>
+    </div>
+
+    <div class="summary-card">
+        <h3>🚨 Active Alerts</h3>
+        <p id="alert-count">0</p>
+    </div>
+
+    <div class="summary-card">
+        <h3>🟢 Normal Rooms</h3>
+        <p id="normal-count">4</p>
+    </div>
+</div>
+
+    <div class="building-status" id="building-status">
+    🟢 BUILDING STATUS: NORMAL
+   </div>
+
+    <div class="building-view">
+    <h2>🏢 Building Digital Twin</h2>
+
+    <div class="building-floor">
+        <div class="building-room" id="twin-room101">
+            <h3>Room 101</h3>
+            <p id="twin-temp101">--°C</p>
+            <span id="twin-status101">NORMAL</span>
+        </div>
+
+        <div class="building-room" id="twin-room102">
+            <h3>Room 102</h3>
+            <p id="twin-temp102">--°C</p>
+            <span id="twin-status102">NORMAL</span>
+        </div>
+
+        <div class="building-room" id="twin-room103">
+            <h3>Room 103</h3>
+            <p id="twin-temp103">--°C</p>
+            <span id="twin-status103">NORMAL</span>
+        </div>
+
+        <div class="building-room" id="twin-room104">
+            <h3>Room 104</h3>
+            <p id="twin-temp104">--°C</p>
+            <span id="twin-status104">NORMAL</span>
+        </div>
+    </div>
+</div>
+
+        <div class="rooms">
+
+            <div class="room">
+                <h3>Room 101</h3>
+                <div class="temperature" id="room101-temp">--°C</div>
+                <div class="status" id="room101-status">● NORMAL</div>
+
+                <div class="temp-bar">
+                <div id="room101-bar" class="temp-fill"></div>
+                </div>
+
+                <div class="ac-status" id="room101-ac">
+                ❄️ AC OFF
+                </div>
+            </div>
+
+            <div class="room">
+               <h3>Room 102</h3>
+               <div class="temperature" id="room102-temp">--°C</div>
+               <div class="status" id="room102-status">🟢 NORMAL</div>
+
+               <div class="temp-bar">
+               <div id="room102-bar" class="temp-fill"></div>
+               </div>
+
+               <div class="ac-status" id="room102-ac">
+               ❄️ AC OFF
+               </div>
+            </div>
+
+            <div class="room">
+                <h3>Room 103</h3>
+                <div class="temperature" id="room103-temp">--°C</div>
+                <div class="status" id="room103-status">🟢 NORMAL</div>
+
+                <div class="temp-bar">
+                <div id="room103-bar" class="temp-fill"></div>
+                </div>
+
+                <div class="ac-status" id="room103-ac">
+                ❄️ AC OFF
+                </div>
+            </div>
+
+            <div class="room">
+                <h3>Room 104</h3>
+                <div class="temperature" id="room104-temp">--°C</div>
+                <div class="status" id="room104-status">🟢 NORMAL</div>
+
+                <div class="temp-bar">
+                <div id="room104-bar" class="temp-fill"></div>
+                </div>
+
+                <div class="ac-status" id="room104-ac">
+                ❄️ AC OFF
+                </div>
+            </div>
+
+        </div>
+
+        <div class="dashboard">
+            <h2>📊 Live Building Data</h2>
+            <p>
+                Sensor data is synchronized through MQTT with the
+                digital twin backend.
+            </p>
+        </div>
+
+        <div class="dashboard">
+             <h2>📈 Temperature History</h2>
+             <canvas id="temperatureChart"></canvas>
+        </div>
+
+        <div class="dashboard">
+           <h2>🚨 Temperature Alerts</h2>
+           <div id="alerts">
+              No active alerts
+           </div>
+
+           <div class="dashboard">
+           <h2>📋 System Activity</h2>
+           <div id="activity-log" class="activity-log">
+              Loading activity...
+           </div>
+     </div>
+</div>
+
+    </div>
+<script>
+async function updateTemperature() {
+    const response = await fetch('/api/data');
+    const data = await response.json();
+
+    const rooms = ["room101", "room102", "room103", "room104"];
+
+    document.getElementById("last-updated").innerText =
+    "🕒 Last Updated: " + new Date().toLocaleTimeString();
+    const buildingStatus = document.getElementById("building-status");
+
+   const alerts = document.getElementById("alerts");
+   alerts.innerHTML = "";
+   let hasAlerts = false;
+
+    rooms.forEach(room => {
+        if (data[room]) {
+            const temperature = data[room].temperature;
+
+            document.getElementById(room + "-temp").innerText =
+                temperature + "°C";
+
+            const status = document.getElementById(room + "-status");
+
+            const alerts = document.getElementById("alerts");
+
+ if (temperature > 35) {
+    status.innerText = "🔴 ALERT";
+    status.style.color = "#ff4444";
+
+    alerts.innerHTML += `<p style="color:#ff4444; font-weight:bold;">🚨 ${room} temperature is very high: ${temperature}°C</p>`;
+    hasAlerts = true;
+
+ } else if (temperature > 30) {
+    status.innerText = "🟠 HIGH";
+    status.style.color = "#ff9800";
+
+ } else if (temperature < 18) {
+    status.innerText = "🔵 COOL";
+    status.style.color = "#2196f3";
+
+ } else {
+    status.innerText = "🟢 NORMAL";
+    status.style.color = "#22c55e";
+ }
+ const bar = document.getElementById(room + "-bar");
+
+if (bar) {
+    bar.style.width = Math.min((temperature / 40) * 100, 100) + "%";
+
+    if (temperature > 35) {
+        bar.style.background = "#ff4444";
+    } else if (temperature > 30) {
+        bar.style.background = "#ff9800";
+    } else {
+        bar.style.background = "#22c55e";
+    }
+}
+
+const roomNumber = room.replace("room", "");
+
+document.getElementById("twin-temp" + roomNumber).innerText =
+    temperature.toFixed(1) + "°C";
+
+const twinStatus = document.getElementById("twin-status" + roomNumber);
+
+if (temperature > 35) {
+    twinStatus.innerText = "🔴 ALERT";
+} else if (temperature > 30) {
+    twinStatus.innerText = "🟠 HIGH";
+} else if (temperature < 18) {
+    twinStatus.innerText = "🔵 COOL";
+} else {
+    twinStatus.innerText = "🟢 NORMAL";
+}
+
+const twinRoom = document.getElementById("twin-room" + roomNumber);
+
+if (temperature > 35) {
+    twinRoom.style.borderColor = "#ff4444";
+    twinRoom.style.background = "#3b1f1f";
+} else if (temperature > 30) {
+    twinRoom.style.borderColor = "#ff9800";
+    twinRoom.style.background = "#3b2f1f";
+} else if (temperature < 18) {
+    twinRoom.style.borderColor = "#2196f3";
+    twinRoom.style.background = "#1f2f3b";
+} else {
+    twinRoom.style.borderColor = "#22c55e";
+    twinRoom.style.background = "#1f3328";
+}
+
+const ac = document.getElementById(room + "-ac");
+
+if (ac) {
+    if (temperature > 30) {
+        ac.innerText = "❄️ AC ON";
+        ac.style.color = "#38bdf8";
+    } else {
+        ac.innerText = "❄️ AC OFF";
+        ac.style.color = "#94a3b8";
+    }
+}
+
+ if (!hasAlerts) {
+    alerts.innerHTML = "<p>🟢 No active alerts</p>";
+}
+
+const temperatures = rooms.map(room => data[room].temperature);
+
+const maxTemperature = Math.max(...temperatures);
+
+if (maxTemperature > 35) {
+    buildingStatus.innerText = "🔴 BUILDING STATUS: ALERT";
+    buildingStatus.style.color = "#ff4444";
+    buildingStatus.style.background = "#3b1f1f";
+
+} else if (maxTemperature > 30) {
+    buildingStatus.innerText = "🟠 BUILDING STATUS: WARNING";
+    buildingStatus.style.color = "#ff9800";
+    buildingStatus.style.background = "#3b2f1f";
+
+} else {
+    buildingStatus.innerText = "🟢 BUILDING STATUS: NORMAL";
+    buildingStatus.style.color = "#22c55e";
+    buildingStatus.style.background = "#1f3328";
+}
+
+
+
+const average = temperatures.reduce((a, b) => a + b, 0) / temperatures.length;
+
+document.getElementById("average-temp").innerText =
+    average.toFixed(1) + " °C";
+
+const activeAlerts = temperatures.filter(temp => temp > 35).length;
+
+document.getElementById("alert-count").innerText = activeAlerts;
+
+document.getElementById("normal-count").innerText =
+    temperatures.filter(temp => temp <= 30).length;
+        }
+    });
+}
+
+updateTemperature();
+
+setInterval(updateTemperature, 3000);
+</script>
+
+<script>
+    let temperatureChart;
+async function loadHistory() {
+    const response = await fetch('/api/history');
+    const data = await response.json();
+
+    const labels = data.room101.map((_, i) => i + 1);
+
+    temperatureChart = new Chart(document.getElementById('temperatureChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Room 101',
+                    data: data.room101,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Room 102',
+                    data: data.room102,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Room 103',
+                    data: data.room103,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Room 104',
+                    data: data.room104,
+                    borderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Temperature (°C)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Reading'
+                    }
+                }
+            }
+        }
+    });
+    }
+    async function updateHistoryChart() {
+    const response = await fetch('/api/history');
+    const data = await response.json();
+
+    temperatureChart.data.labels =
+        data.room101.map((_, i) => i + 1);
+
+    temperatureChart.data.datasets[0].data = data.room101;
+    temperatureChart.data.datasets[1].data = data.room102;
+    temperatureChart.data.datasets[2].data = data.room103;
+    temperatureChart.data.datasets[3].data = data.room104;
+
+    temperatureChart.update();
+}
+
+loadHistory();
+
+setInterval(updateHistoryChart, 3000);
+
+async function updateActivityLog() {
+    const response = await fetch('/api/activity');
+    const activities = await response.json();
+
+    const activityLog = document.getElementById("activity-log");
+
+    activityLog.innerHTML = "";
+
+    activities.slice().reverse().forEach(activity => {
+        activityLog.innerHTML += `
+            <div class="activity-item">
+                📡 ${activity}
+            </div>
+        `;
+    });
+}
+
+updateActivityLog();
+setInterval(updateActivityLog, 3000);
+</script>
+
+</body>
+</html>
